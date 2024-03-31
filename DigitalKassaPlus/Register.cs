@@ -19,7 +19,6 @@ namespace DigitalKassaPlus
         public decimal Cash { get; private set; }
         public List<Order> Orders { get; private set; }
         public Order CurrentOrder {  get; private set; }
-
         public Dictionary<int, Product> ProductList { get; private set; }
         public Dictionary<int, Customer> CustomerList { get; private set; }
 
@@ -33,7 +32,6 @@ namespace DigitalKassaPlus
             ProductList = dbManager.GetProducts();
             CustomerList = dbManager.GetCustomers();
         }
-
         public LoginResult Login()
         {
             Console.WriteLine("No employee has been logged in.");
@@ -85,7 +83,6 @@ namespace DigitalKassaPlus
                 return LoginResult.INVALIDINPUT;
             }
         }
-
         public bool Logout()
         {
             if (LoggedIn && Employee != null && Employee is User)
@@ -99,7 +96,6 @@ namespace DigitalKassaPlus
                 return true;
             }
         }
-
         public bool ScanCustomerCard(int id)
         {
             if (!LoggedIn)
@@ -122,7 +118,6 @@ namespace DigitalKassaPlus
 
             return false;
         }
-
         public void AddProduct(int code)
         {
             if (!LoggedIn)
@@ -181,7 +176,7 @@ namespace DigitalKassaPlus
                 Console.WriteLine("ERROR: product does not exist.");
             }
         }
-        public void PayOrder() // TODO: handle choice handling in Program.cs (when making UI)
+        public void PayOrder()
         {
             if (!LoggedIn)
             {
@@ -247,6 +242,11 @@ namespace DigitalKassaPlus
                     {
                         Orders.Add(CurrentOrder);
 
+                        if (!dbManager.InsertOrder(CurrentOrder)) // if an error occured during inserting into database
+                        {
+                            Console.WriteLine("ERROR: something went wrong while updating the database.");
+                        }
+
                         Console.WriteLine("You have payed!\nThank you!");
 
                         CurrentOrder = null;
@@ -261,6 +261,11 @@ namespace DigitalKassaPlus
                     try
                     {
                         Orders.Add(CurrentOrder);
+
+                        if (!dbManager.InsertOrder(CurrentOrder)) // if an error occured during inserting into database
+                        {
+                            Console.WriteLine("ERROR: something went wrong while updating the database.");
+                        }
 
                         Console.WriteLine("You have payed!\nThank you!");
                         Console.WriteLine($"Return: €{decimal.Negate(CurrentOrder.PriceToPay)}"); // negate to turn the negative value into a positive.
@@ -282,7 +287,6 @@ namespace DigitalKassaPlus
                     break;
             }
         }
-
         public string GetProductsList()
         {
             if (!LoggedIn)
@@ -304,7 +308,6 @@ namespace DigitalKassaPlus
 
             return output;
         }
-
         public string GetProductsInOrder()
         {
             if (!LoggedIn)
@@ -340,7 +343,6 @@ namespace DigitalKassaPlus
 
             return output;
         }
-
         /// <summary>
         /// Get all known customers.
         /// </summary>
@@ -367,6 +369,5 @@ namespace DigitalKassaPlus
 
             return output;
         }
-
     }
 }

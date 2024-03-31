@@ -224,13 +224,16 @@ namespace DigitalKassaPlus.DAL
         /// Insert an order into the database
         /// </summary>
         /// <param name="order">The <see cref="Order"> to insert.</param>
-        public void InsertOrder(Order order)
+        public bool InsertOrder(Order order)
         {
             try
             {
                 SqlCommand cmd;
-                string sqlStatement = @"INSERT INTO ORDERS (employeecode, ispayed) VALUES(@employeecode, @ispayed); SELECT CAST(scope_identity() AS int);";
-                string orderProductStatement = @"INSERT INTO ORDERPRODUCT (ordercode, productcode, amount) VALUES(@ordercode, @productcode, @amount)";
+                SqlCommand cmd2;
+                SqlCommand cmd3;
+                string orderStatement = @"INSERT INTO ORDERS (employeecode, ispayed) VALUES(@employeecode, @ispayed); SELECT CAST(scope_identity() AS int);";
+                string orderProductStatement = @"INSERT INTO ORDERPRODUCT (ordercode, productcode, amount) VALUES(@ordercode, @productcode, @amount);";
+                string orderCustomerStatement = @"INSERT INTO CUSTOMERORDER (ordercode, customercode) VALUES(@ordercode_, @customercode);";
                 
                 using (SqlConnection sqlConnection = new SqlConnection(connectionString))
                 {
@@ -238,35 +241,81 @@ namespace DigitalKassaPlus.DAL
 
                     using (SqlTransaction sqlTransaction = sqlConnection.BeginTransaction())
                     {
-                        cmd = new SqlCommand(sqlStatement, sqlConnection);
-                        cmd.Parameters.Add("@employeecode", System.Data.SqlDbType.Int, order.Employee.Id);
-                        cmd.Parameters.Add("@ispayed", System.Data.SqlDbType.Bit, order.IsPayed ? 1 : 0); // if IsPayed == True: '1' else '0'
+                        cmd = new SqlCommand(orderStatement, sqlConnection, sqlTransaction);
+                        cmd.Parameters.AddWithValue("@employeecode", order.Employee.Id);
+                        cmd.Parameters.AddWithValue("@ispayed", order.IsPayed);
 
                         int orderId = (int) cmd.ExecuteScalar();
 
-                        cmd.CommandText = orderProductStatement;
+                        cmd2 = new SqlCommand(orderProductStatement, sqlConnection, sqlTransaction);
 
                         foreach (KeyValuePair<Product, int> pair in order.Products)
                         {
-                            cmd.Parameters.Clear();
+                            cmd2.Parameters.Clear();
+                            cmd2.Parameters.AddWithValue("@ordercode", orderId);
+                            cmd2.Parameters.AddWithValue("@productcode", pair.Key.Code);
+                            cmd2.Parameters.AddWithValue("@amount", pair.Value);
 
-                            cmd.Parameters.Add("@ordercode", System.Data.SqlDbType.Int, orderId);
-                            cmd.Parameters.Add("@productcode", System.Data.SqlDbType.Int, pair.Key.Code);
-                            cmd.Parameters.Add("@amount", System.Data.SqlDbType.Int, pair.Value);
-
-                            cmd.ExecuteNonQuery();
-
+                            cmd2.ExecuteNonQuery();
                         }
                         
+                        cmd3 = new SqlCommand(orderCustomerStatement, sqlConnection, sqlTransaction);
+                        cmd3.Parameters.AddWithValue("@ordercode_", orderId);
+                        cmd3.Parameters.AddWithValue("@customercode", order.Customer.Code);
+                        cmd3.ExecuteNonQuery();
+
                         sqlTransaction.Commit();
                     }
 
                 }
 
-            } catch (SqlException ex) { throw ex;}
+            } catch (SqlException) { return false; }
 
-            
+            return true;
         }
 
+        /// <summary>
+        /// Insert a new <see cref="Customer"/> into the database
+        /// </summary>
+        /// <param name="customer"></param>
+        public bool InsertCustomer(Customer customer)
+        {
+            try
+            {
+                SqlCommand cmd;
+                SqlCommand cmd2;
+                string customerStatement = @"INSERT INTO CUSTOMER (name, birthdate, phone, email, cardcode, points) VALUES (@customername, @birthdate, @phone, @email, @cardcode, @points); SELECT CAST(scope_identity() AS int);";
+                string customerCardStatement = @"INSERT INTO CUSTOMERCARD (isactive) VALUES (@isactive);";
+
+                using (SqlConnection sqlConnection = new SqlConnection(connectionString))
+                {
+                    sqlConnection.Open();
+                    using (SqlTransaction sqlTransaction = sqlConnection.BeginTransaction())
+                    {
+                        using (cmd = new SqlCommand(customerCardStatement, sqlConnection, sqlTransaction))
+                        {
+                            cmd.Parameters.AddWithValue("@isactive", customer.Card.IsActive);
+                            int cardId = (int) cmd.ExecuteScalar();
+
+                            using (cmd2 = new SqlCommand(customerStatement, sqlConnection, sqlTransaction))
+                            {
+                                cmd2.Parameters.AddWithValue("@customername", customer.Name);
+                                cmd2.Parameters.AddWithValue("@birthdate", customer.BirthDate);
+                                cmd2.Parameters.AddWithValue("@phone", customer.Phone);
+                                cmd2.Parameters.AddWithValue("@email", customer.Email);
+                                cmd2.Parameters.AddWithValue("@cardcode", cardId);
+                                cmd2.Parameters.AddWithValue("@points", customer.Points);
+
+                                cmd2.ExecuteNonQuery();
+
+                                sqlTransaction.Commit();
+                            }
+                        }
+                    }
+                }
+            } catch (SqlException ex) { throw ex;}
+
+            return true;
+        }
     }
 }

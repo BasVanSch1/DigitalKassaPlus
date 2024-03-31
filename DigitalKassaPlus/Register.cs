@@ -7,7 +7,7 @@ namespace DigitalKassaPlus
 {
     enum LoginResult
     {
-        SUCCESS, BLOCKED, INVALIDINPUT, GENERICFAILED, INVALIDUSER
+        SUCCESS, BLOCKED, INVALIDINPUT, INVALIDUSER, GENERICFAILED, 
     }
 
     internal class Register
@@ -15,8 +15,6 @@ namespace DigitalKassaPlus
         private readonly SingletonDAL dbManager;
         public bool LoggedIn {  get; private set; }
         public User Employee { get; private set; }
-        public decimal StartingCash { get; private set; }
-        public decimal Cash { get; private set; }
         public List<Order> Orders { get; private set; }
         public Order CurrentOrder {  get; private set; }
         public Dictionary<int, Product> ProductList { get; private set; }
@@ -26,8 +24,6 @@ namespace DigitalKassaPlus
         {
             dbManager = SingletonDAL.Instance;
             LoggedIn = false;
-            StartingCash = 0;
-            Cash = 0;
             Orders = new List<Order>();
             ProductList = dbManager.GetProducts();
             CustomerList = dbManager.GetCustomers();

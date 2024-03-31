@@ -8,8 +8,8 @@ namespace DigitalKassaPlus
 {
     internal class Service : Product
     {
-        public Service(int _code, string _description, decimal _price, TaxCode _taxid) :
-            base(_code, _description, _price, _taxid)
+        public Service(int _code, string _description, decimal _price, TaxCode _taxid, int _stock) :
+            base(_code, _description, _price, _taxid, _stock)
         { }        
     }
 }

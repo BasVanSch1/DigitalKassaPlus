@@ -134,6 +134,7 @@ namespace DigitalKassaPlus
                                 case 6:
                                     {
                                         Console.Clear();
+                                        Console.WriteLine("NOTICE: stock changes while making orders is not implemented yet.\n");
                                         Console.WriteLine(register.GetProductsList());
                                         Console.Write("\nPress any key to continue...");
                                         Console.ReadKey();
@@ -148,7 +149,7 @@ namespace DigitalKassaPlus
                                         Console.ReadKey();
                                         break;
                                     }
-                                case 8: // add new customer
+                                case 8:
                                     if (register.Employee is Manager)
                                     {
                                         Console.Clear();
@@ -183,6 +184,10 @@ namespace DigitalKassaPlus
                                         Console.Write("\nPress any key to continue...");
                                         Console.ReadKey();
 
+                                    } else
+                                    {
+                                        Console.WriteLine("ERROR: that option does not exist!\nPress any key to continue...");
+                                        Console.ReadKey();
                                     }
                                     break;
                                 case 9: // manage stock
@@ -190,6 +195,40 @@ namespace DigitalKassaPlus
                                     {
                                         Console.Clear();
 
+                                        Console.WriteLine(register.GetProductsList());
+
+                                        Console.Write("Enter a productID: ");
+                                        if (Int32.TryParse(Console.ReadLine(), out int _productId)) {
+
+                                            if (register.ProductList.ContainsKey(_productId))
+                                            {
+                                                Console.Write("Set stock to: ");
+                                                if (Int32.TryParse(Console.ReadLine(), out int _stock))
+                                                {
+                                                    register.ManageStock(_productId, _stock);
+                                                } else
+                                                {
+                                                    Console.WriteLine("ERROR: please enter a valid number.\n");
+                                                }
+                                            } else
+                                            {
+                                                Console.WriteLine("ERROR: that product does not exist.\n");
+                                            }
+                                            
+
+                                        } else
+                                        {
+                                            Console.WriteLine("ERROR: please enter a valid number.\n");
+                                        }
+
+
+
+                                        Console.Write("\nPress any key to continue...");
+                                        Console.ReadKey();
+                                    } else
+                                    {
+                                        Console.WriteLine("ERROR: that option does not exist!\nPress any key to continue...");
+                                        Console.ReadKey();
                                     }
                                     break;
                                 case 99:
@@ -231,19 +270,24 @@ namespace DigitalKassaPlus
                             switch (decision)
                             {
                                 case 1:
-                                    if (register.Login() == LoginResult.SUCCESS)
+                                    switch (register.Login())
                                     {
-                                        Console.Clear();
-                                        Console.WriteLine("Login Successful\n");
-                                        choosing = false;
-                                        break;
-                                    } else if (register.Login() == LoginResult.BLOCKED)
-                                    {
-                                        Console.Clear();
-                                        Console.WriteLine("Your account is blocked, please login with a different account\n");
-                                        break;
+                                        case LoginResult.SUCCESS:
+                                            Console.Clear();
+                                            Console.WriteLine("Login Successful\n");
+                                            choosing = false;
+                                            break;
+                                        case LoginResult.BLOCKED:
+                                            Console.Clear();
+                                            Console.WriteLine("Your account is blocked, please login with a different account\n");
+                                            break;
+                                        case LoginResult.INVALIDUSER:
+                                            Console.Clear();
+                                            Console.WriteLine("ERROR: That userid does not exist.\n");
+                                            break;
                                     }
                                     break;
+                                    
                                 case 2:
                                     choosing = false;
                                     registerOn = false;

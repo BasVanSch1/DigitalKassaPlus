@@ -8,15 +8,15 @@ namespace DigitalKassaPlus
 {
     internal class Article : Product
     {
-        public string Manufacturer { get; private set; } // wordt uiteindelijk van de class Manufacturer
+        public string Manufacturer { get; private set; }
 
-        public Article(int _productCode, string _description, decimal _price, string _manufacturer, TaxCode _tax) : 
-            base(_productCode, _description, _price, _tax)
+        public Article(int _productCode, string _description, decimal _price, string _manufacturer, TaxCode _tax, int _stock) : 
+            base(_productCode, _description, _price, _tax, _stock)
         {
             Manufacturer = _manufacturer;
         }
-        public Article(int _productCode, string _description, decimal _price, TaxCode _tax) :
-            this(_productCode, _description, _price, "", _tax) // zonder manufacturer
+        public Article(int _productCode, string _description, decimal _price, TaxCode _tax, int _stock) :
+            this(_productCode, _description, _price, "", _tax, _stock) // zonder manufacturer
         { }
 
 

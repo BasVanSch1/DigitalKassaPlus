@@ -51,7 +51,6 @@
     <Compile Include="DAL\SingletonDAL.cs" />
     <Compile Include="Employee.cs" />
     <Compile Include="Manager.cs" />
-    <Compile Include="Manufacturer.cs" />
     <Compile Include="Order.cs" />
     <Compile Include="PaymentMethod.cs" />
     <Compile Include="Product.cs" />

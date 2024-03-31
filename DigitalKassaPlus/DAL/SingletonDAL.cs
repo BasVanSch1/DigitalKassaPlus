@@ -118,7 +118,7 @@ namespace DigitalKassaPlus.DAL
                     SqlCommand cmd;
                     SqlDataReader reader;
 
-                    string sqlStatement = "SELECT p.code, p.description, p.price, p.taxcode, p.type, t.percentage, t.description as taxdescription " +
+                    string sqlStatement = "SELECT p.code, p.description, p.price, p.taxcode, p.type, t.percentage, t.description as taxdescription, p.stock " +
                                             "FROM PRODUCT p " +
                                             "INNER JOIN TAXCODE t on t.code = p.taxcode";
 
@@ -135,17 +135,18 @@ namespace DigitalKassaPlus.DAL
                         string type = (string) reader["type"];
                         decimal taxpercentage = (decimal) reader["percentage"];
                         string taxdescription = (string) reader["taxdescription"];
+                        int stock = (int) reader["stock"];
 
                         switch (type.ToLower())
                         {
                             case "article":
                                 {
-                                    products.Add(productcode, new Article(productcode, description, price, new TaxCode(taxid, taxpercentage, taxdescription)));
+                                    products.Add(productcode, new Article(productcode, description, price, new TaxCode(taxid, taxpercentage, taxdescription), stock));
                                     break;
                                 }
                             case "service":
                                 {
-                                    products.Add(productcode, new Service(productcode, description, price, new TaxCode(taxid, taxpercentage, taxdescription)));
+                                    products.Add(productcode, new Service(productcode, description, price, new TaxCode(taxid, taxpercentage, taxdescription), stock));
                                     break;
                                 }
                             default:
@@ -327,6 +328,33 @@ namespace DigitalKassaPlus.DAL
 
                                 sqlTransaction.Commit();
                             }
+                        }
+                    }
+                }
+            } catch (SqlException ex) { throw ex;}
+
+            return true;
+        }
+
+        public bool UpdateStock(Product product)
+        {
+            try
+            {
+                SqlCommand cmd;
+                string sqlStatement = @"UPDATE PRODUCT SET stock = @stock WHERE code = @productcode;";
+                using (SqlConnection sqlConnection = new SqlConnection(connectionString))
+                {
+                    sqlConnection.Open();
+
+                    using (SqlTransaction sqlTransaction = sqlConnection.BeginTransaction())
+                    {
+                        using (cmd = new SqlCommand(sqlStatement, sqlConnection, sqlTransaction))
+                        {
+                            cmd.Parameters.AddWithValue("@stock", product.Stock);
+                            cmd.Parameters.AddWithValue("@productcode", product.Code);
+                            cmd.ExecuteNonQuery();
+
+                            sqlTransaction.Commit();
                         }
                     }
                 }

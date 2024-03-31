@@ -7,7 +7,7 @@ namespace DigitalKassaPlus
 {
     enum LoginResult
     {
-        SUCCESS, BLOCKED, INVALIDINPUT, GENERICFAILED
+        SUCCESS, BLOCKED, INVALIDINPUT, GENERICFAILED, INVALIDUSER
     }
 
     internal class Register
@@ -41,6 +41,11 @@ namespace DigitalKassaPlus
             {
                 int attempt = 1;
                 User user = dbManager.GetUser(employeeId);
+
+                if (user == null)
+                {
+                    return LoginResult.INVALIDUSER;
+                }
 
                 while (attempt <= 3 && user.IsActive)
                 {
@@ -187,6 +192,7 @@ namespace DigitalKassaPlus
             if (CurrentOrder == null)
             {
                 Console.WriteLine("Error: CurrentOrder does not exist.");
+                return;
             }
 
             if (CurrentOrder.Products.Count == 0)
@@ -202,7 +208,7 @@ namespace DigitalKassaPlus
             }
 
             bool choosing = true;
-            PaymentMethod method = new CardPayment(); // default
+            PaymentMethod method = new CardPayment();
 
             int productcount = 0;
             foreach (KeyValuePair<Product, int> pair in CurrentOrder.Products)
@@ -305,11 +311,11 @@ namespace DigitalKassaPlus
                 return "Error: there are no products defined.";
             }
 
-            string output = $"Product Code \t| Description \t| Price \t| Tax\n";
+            string output = $"Product Code \t| Description \t| Price \t| Tax \t| Stock\n";
 
             foreach (KeyValuePair<int, Product> pair in ProductList)
             {
-                output += $"{pair.Key} \t| {pair.Value.Description} \t| €{pair.Value.Price} \t| {pair.Value.Tax.Description}\n";
+                output += $"{pair.Key} \t| {pair.Value.Description} \t| €{pair.Value.Price} \t| {pair.Value.Tax.Description} \t| {pair.Value.Stock}\n";
             }
 
             return output;
@@ -386,6 +392,25 @@ namespace DigitalKassaPlus
             }
 
             return false;
+        }
+
+        public bool ManageStock(int productID, int stock)
+        {
+            if (stock < 0)
+            {
+                Console.WriteLine("ERROR: stock can not be less than 0");
+                return false;
+            }
+            Product product = ProductList[productID];
+            product.Stock = stock;
+
+            if (!dbManager.UpdateStock(product))
+            {
+                return false;
+            }
+
+            RefreshProductList();
+            return true;
         }
 
         private void RefreshProductList()

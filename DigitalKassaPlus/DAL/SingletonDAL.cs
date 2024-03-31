@@ -44,8 +44,25 @@ namespace DigitalKassaPlus.DAL
                     reader.Read(); // only advance once, since there shouldn't be any other records.
 
                     string name = (string) reader["name"];
-                    string phone = (string) reader["phone"];
-                    string email = (string) reader["email"];
+
+                    string phone;
+                    if (reader["phone"] is DBNull) // can be null in db
+                    {
+                        phone = "";
+                    } else
+                    {
+                        phone = (string)reader["phone"];
+                    }
+
+                    string email;
+                    if (reader["email"] is DBNull) // can be null in db
+                    {
+                        email = "";
+                    } else
+                    {
+                        email = (string)reader["email"];
+                    }
+
                     bool ismanager = (bool) reader["ismanager"];
                     bool isactive = (bool) reader["isactive"];
 

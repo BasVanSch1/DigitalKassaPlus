@@ -17,13 +17,7 @@ namespace DigitalKassaPlus
             {
                 if (register.LoggedIn)
                 {
-                    Console.WriteLine($"Welcome {register.Employee.Name}");
-
-                    bool choosing = true;
-
-                    while (choosing)
-                    {
-                        Console.WriteLine("\nSelect an action:\n" +
+                    const string menu = "\nSelect an action:\n" +
                             "Option 1: Scan CustomerCard\n" +
                             "Option 2: Add Product to this Order\n" +
                             "Option 3: Remove Product from this Order\n" +
@@ -31,7 +25,28 @@ namespace DigitalKassaPlus
                             "Option 5: Pay for this Order\n" +
                             "Option 6: See list of known products\n" +
                             "Option 7: See list of known customers\n" +
-                            "Option 8: Logout");
+                            "Option 99: Logout";
+
+                    const string managerMenu = "\nSelect an action:\n" +
+                            "Option 1: Scan CustomerCard\n" +
+                            "Option 2: Add Product to this Order\n" +
+                            "Option 3: Remove Product from this Order\n" +
+                            "Option 4: See Products in this Order\n" +
+                            "Option 5: Pay for this Order\n" +
+                            "Option 6: See list of known products\n" +
+                            "Option 7: See list of known customers\n" +
+                            "---------------------------------------\n" +
+                            "Option 8: Add new Customer\n" +
+                            "Option 9: Manage Stock\n" +
+                            "Option 99: Logout";
+
+                    bool choosing = true;
+
+                    while (choosing)
+                    {
+                        Console.Clear();
+                        Console.WriteLine($"Welcome {register.Employee.Name}");
+                        Console.WriteLine(register.Employee is Manager ? managerMenu : menu); // check if employee is of type Manager.
                         Console.Write("Choice: ");
 
                         if (Int32.TryParse(Console.ReadLine(), out int decision))
@@ -119,6 +134,20 @@ namespace DigitalKassaPlus
                                         break;
                                     }
                                 case 8:
+                                    if (register.Employee is Manager)
+                                    {
+                                        Console.Clear();
+
+                                    }
+                                    break;
+                                case 9:
+                                    if (register.Employee is Manager)
+                                    {
+                                        Console.Clear();
+
+                                    }
+                                    break;
+                                case 99:
                                     {
                                         if (register.Logout()) // if logout successful
                                         {
@@ -129,6 +158,8 @@ namespace DigitalKassaPlus
                                         break;
                                     }
                                 default:
+                                    Console.WriteLine("ERROR: that option does not exist!\nPress any key to continue...");
+                                    Console.Read();
                                     break;
                             }
                         } else

@@ -195,6 +195,12 @@ namespace DigitalKassaPlus
                 return;
             }
 
+            if (CurrentOrder.Customer == null)
+            {
+                Console.WriteLine("Error: this order does not contain a customer.");
+                return;
+            }
+
             bool choosing = true;
             PaymentMethod method = new CardPayment(); // default
 
@@ -368,6 +374,28 @@ namespace DigitalKassaPlus
             }
 
             return output;
+        }
+
+        public bool CreateCustomer(string name, DateTime birthdate, string phone, string email)
+        {
+            Customer customer = new Customer(0, name, birthdate, phone, email, 0, new CustomerCard(0));
+            if (dbManager.InsertCustomer(customer))
+            {
+                RefreshCustomersList();
+                return true;
+            }
+
+            return false;
+        }
+
+        private void RefreshProductList()
+        {
+            ProductList = dbManager.GetProducts();
+        }
+
+        private void RefreshCustomersList()
+        {
+            CustomerList = dbManager.GetCustomers();
         }
     }
 }

@@ -74,22 +74,27 @@ namespace DigitalKassaPlus
                                         {
                                             Console.WriteLine("ERROR: a cardcode can only contain numeric values.");
                                         }
+
+                                        Console.Write("\nPress any key to continue...");
+                                        Console.ReadKey();
                                         break;
                                     }
                                 case 2:
                                     {
                                         Console.Clear();
+                                        Console.WriteLine(register.GetProductsList());
                                         Console.Write($"Enter productcode: ");
 
                                         if (Int32.TryParse(Console.ReadLine(), out int code))
                                         {
                                             register.AddProduct(code);
+                                            Console.Write("\nPress any key to continue...");
+                                            Console.ReadKey();
                                         }
                                         else
                                         {
                                             Console.WriteLine("ERROR: a productcode can only contain numeric values.");
                                         }
-
                                         break;
                                     }
                                 case 3:
@@ -106,24 +111,32 @@ namespace DigitalKassaPlus
                                             Console.WriteLine("ERROR: a productcode can only contain numeric values.");
                                         }
 
+                                        Console.Write("\nPress any key to continue...");
+                                        Console.ReadKey();
                                         break;
                                     }
                                 case 4:
                                     {
                                         Console.Clear();
                                         Console.WriteLine(register.GetProductsInOrder());
+                                        Console.Write("\nPress any key to continue...");
+                                        Console.ReadKey();
                                         break;
                                     }
                                 case 5:
                                     {
                                         Console.Clear();
                                         register.PayOrder();
+                                        Console.Write("\nPress any key to continue...");
+                                        Console.ReadKey();
                                         break;
                                     }
                                 case 6:
                                     {
                                         Console.Clear();
                                         Console.WriteLine(register.GetProductsList());
+                                        Console.Write("\nPress any key to continue...");
+                                        Console.ReadKey();
 
                                         break;
                                     }
@@ -131,16 +144,48 @@ namespace DigitalKassaPlus
                                     {
                                         Console.Clear();
                                         Console.WriteLine(register.GetCustomersList());
+                                        Console.Write("\nPress any key to continue...");
+                                        Console.ReadKey();
                                         break;
                                     }
-                                case 8:
+                                case 8: // add new customer
                                     if (register.Employee is Manager)
                                     {
                                         Console.Clear();
+                                        string _name;
+                                        string _phone;
+                                        string _email;
+                                        DateTime _birthdate;
+
+                                        Console.Write("Enter the name of the new Customer: ");
+                                        _name = Console.ReadLine();
+
+                                        Console.Write("Enter the phonenumer of the new Customer: ");
+                                        _phone = Console.ReadLine();
+
+                                        Console.Write("Enter the emailadress of the new Customer: ");
+                                        _email = Console.ReadLine();
+
+                                        Console.Write("Enter the birthdate of the new Customer: ");
+                                        if (!DateTime.TryParse(Console.ReadLine(), out _birthdate)) // if failed
+                                        {
+                                            _birthdate = DateTime.Now;
+                                            Console.WriteLine("ERROR: Invalid format, setting birthdate to today.");
+                                        }
+
+                                        if (register.CreateCustomer(_name, _birthdate, _phone, _email))
+                                        {
+                                            Console.WriteLine($"Succesfully created customer: {_name}");
+                                        } else
+                                        {
+                                            Console.WriteLine("ERROR: failed to create new customer.");
+                                        }
+                                        Console.Write("\nPress any key to continue...");
+                                        Console.ReadKey();
 
                                     }
                                     break;
-                                case 9:
+                                case 9: // manage stock
                                     if (register.Employee is Manager)
                                     {
                                         Console.Clear();
@@ -159,12 +204,14 @@ namespace DigitalKassaPlus
                                     }
                                 default:
                                     Console.WriteLine("ERROR: that option does not exist!\nPress any key to continue...");
-                                    Console.Read();
+                                    Console.ReadKey();
                                     break;
                             }
                         } else
                         {
                             Console.WriteLine($"\nERROR: please enter a valid number.\n");
+                            Console.Write("\nPress any key to continue...");
+                            Console.ReadKey();
                         }
                     }
                 } 

@@ -301,8 +301,8 @@ namespace DigitalKassaPlus.DAL
             {
                 SqlCommand cmd;
                 SqlCommand cmd2;
-                string customerStatement = @"INSERT INTO CUSTOMER (name, birthdate, phone, email, cardcode, points) VALUES (@customername, @birthdate, @phone, @email, @cardcode, @points); SELECT CAST(scope_identity() AS int);";
-                string customerCardStatement = @"INSERT INTO CUSTOMERCARD (isactive) VALUES (@isactive);";
+                string customerStatement = @"INSERT INTO CUSTOMER (name, birthdate, phone, email, cardcode, points) VALUES (@customername, @birthdate, @phone, @email, @cardcode, @points)";
+                string customerCardStatement = @"INSERT INTO CUSTOMERCARD (isactive) VALUES (@isactive); SELECT CAST(scope_identity() AS int);";
 
                 using (SqlConnection sqlConnection = new SqlConnection(connectionString))
                 {
